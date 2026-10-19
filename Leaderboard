@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>BFT Gladesville Project 100 Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --blue: #1f6bff;
+    --blue-deep: #0b3fb8;
+    --line: #2a2a2a;
+    --muted: #a8a8a8;
+    --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--black); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 48px; }
+
+  /* Header */
+  header { padding: 28px 0 20px; border-bottom: 4px solid var(--blue); }
+  .club {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--blue);
+    margin: 0 0 4px;
+    letter-spacing: 0.02em;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.3rem, 11vw, 4rem);
+    line-height: 0.95;
+    margin: 0;
+    text-transform: uppercase;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+    margin-top: 16px; color: var(--muted); font-size: 0.9rem;
+  }
+  .meta strong { color: var(--white); font-weight: 600; }
+  button.refresh {
+    font: inherit; font-weight: 600; font-size: 0.9rem;
+    color: var(--white); background: transparent;
+    border: 2px solid var(--blue); border-radius: 999px;
+    padding: 6px 16px; cursor: pointer; min-height: 36px;
+  }
+  button.refresh:hover { background: var(--blue); }
+  button.refresh:focus-visible, a:focus-visible { outline: 3px solid var(--white); outline-offset: 3px; }
+
+  /* Status */
+  #status { margin: 20px 0 0; }
+  .notice {
+    padding: 14px 16px; border-left: 6px solid var(--blue);
+    background: #141414; font-size: 0.98rem;
+  }
+  .notice.error { border-left-color: var(--white); }
+  .notice b { display: block; margin-bottom: 2px; }
+
+  /* Podium */
+  .podium {
+    display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 8px;
+    align-items: end; margin: 32px 0 8px;
+  }
+  .slot { display: flex; flex-direction: column; align-items: stretch; min-width: 0; text-align: center; }
+  .who { padding: 0 2px 10px; }
+  .who .name {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(1.05rem, 5vw, 1.6rem); line-height: 1.05;
+    overflow-wrap: anywhere; hyphens: auto;
+  }
+  .slot.first .who .name { font-size: clamp(1.25rem, 6vw, 2rem); }
+  .who .pts { margin-top: 4px; font-weight: 600; font-size: 0.95rem; color: var(--muted); }
+  .who .pts b { color: var(--white); font-size: 1.15em; font-weight: 600; }
+  .block {
+    display: flex; align-items: flex-start; justify-content: center;
+    border: 2px solid var(--white); border-bottom: 0;
+    font-family: var(--display); font-weight: 800; line-height: 1; padding-top: 8px;
+  }
+  .slot.first .block  { height: 170px; background: var(--blue); border-color: var(--blue); font-size: 5.5rem; }
+  .slot.second .block { height: 124px; font-size: 4rem; }
+  .slot.third .block  { height: 92px;  font-size: 3.2rem; }
+  .podium-base { height: 4px; background: var(--white); margin-bottom: 8px; }
+
+  /* Ranking table */
+  .rank-list { list-style: none; margin: 24px 0 0; padding: 0; }
+  .rank-list li {
+    display: grid; grid-template-columns: 52px 1fr auto; align-items: center; gap: 8px;
+    padding: 14px 4px; border-bottom: 1px solid var(--line);
+  }
+  .rank-list .pos { font-family: var(--display); font-weight: 800; font-size: 1.7rem; color: var(--blue); }
+  .rank-list .nm { font-weight: 500; font-size: 1.08rem; overflow-wrap: anywhere; }
+  .rank-list .sc { font-family: var(--display); font-weight: 700; font-size: 1.5rem; text-align: right; }
+  .list-head {
+    display: grid; grid-template-columns: 52px 1fr auto; gap: 8px;
+    padding: 0 4px 8px; color: var(--muted); font-size: 0.85rem; border-bottom: 2px solid var(--white);
+    margin-top: 28px;
+  }
+  .list-head span:last-child { text-align: right; }
+  .list-head + .rank-list { margin-top: 0; }
+
+  .loading-line { height: 18px; background: #1a1a1a; margin: 14px 0; border-radius: 3px; }
+  footer { margin-top: 36px; color: var(--muted); font-size: 0.82rem; }
+
+  @media (max-width: 380px) {
+    .slot.first .block { height: 140px; font-size: 4.5rem; }
+    .slot.second .block { height: 104px; font-size: 3.4rem; }
+    .slot.third .block { height: 78px; font-size: 2.8rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="club">BFT Gladesville</p>
+    <h1>BFT Gladesville Project 100 Leaderboard</h1>
+    <div class="meta">
+      <span>Last updated: <strong id="updated">not yet</strong></span>
+      <button class="refresh" id="refresh" type="button">Refresh now</button>
+    </div>
+  </header>
+
+  <div id="status" role="status" aria-live="polite"></div>
+  <main id="board" aria-label="Leaderboard"></main>
+
+  <footer>Scores refresh automatically every minute. Changes in the sheet can take a few minutes to appear.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Read-only published CSV of the "Leaderboard Feed" tab (names + totals only).
+  var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwlhqr0odXawBEq2ay6FdC77EFLcbW4dYtamXamKm7EvOE03rEykq6iKjVNwANilA1E3vvj2X_QWnn/pub?gid=1380164397&single=true&output=csv";
+  var REFRESH_MS = 60 * 1000;
+
+  var boardEl = document.getElementById("board");
+  var statusEl = document.getElementById("status");
+  var updatedEl = document.getElementById("updated");
+  var refreshBtn = document.getElementById("refresh");
+
+  var lastGood = null;   // last successfully loaded entries
+  var inFlight = false;
+
+  // ---------- CSV parsing (handles quoted fields) ----------
+  function parseCSV(text) {
+    var rows = [], row = [], field = "", inQuotes = false, i, c;
+    text = text.replace(/^\uFEFF/, "");
+    for (i = 0; i < text.length; i++) {
+      c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else { field += c; }
+      } else if (c === '"') { inQuotes = true; }
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n" || c === "\r") {
+        if (c === "\r" && text[i + 1] === "\n") i++;
+        row.push(field); rows.push(row); row = []; field = "";
+      } else { field += c; }
+    }
+    if (field !== "" || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function toNumber(s) {
+    var cleaned = String(s).replace(/[^0-9.\-]/g, "");
+    if (cleaned === "" || cleaned === "-" || cleaned === ".") return NaN;
+    return Number(cleaned);
+  }
+
+  // Keep only name + points; ignore header/blank/non-numeric rows; sort high to low.
+  function toEntries(rows) {
+    var entries = [];
+    rows.forEach(function (r) {
+      var name = (r[0] || "").trim();
+      var pts = toNumber(r[1] === undefined ? "" : r[1]);
+      if (!name || isNaN(pts)) return;
+      entries.push({ name: name, points: pts });
+    });
+    entries.sort(function (a, b) {
+      return b.points - a.points || a.name.localeCompare(b.name);
+    });
+    // Tied scores share a rank (1, 2, 2, 4 ...)
+    var rank = 0, prev = null;
+    entries.forEach(function (e, idx) {
+      if (prev === null || e.points !== prev) { rank = idx + 1; prev = e.points; }
+      e.rank = rank;
+    });
+    return entries;
+  }
+
+  // ---------- Rendering ----------
+  function fmt(n) {
+    return n.toLocaleString("en-AU", { maximumFractionDigits: 1 });
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function podiumSlot(entry, cls) {
+    var slot = el("div", "slot " + cls);
+    var who = el("div", "who");
+    who.appendChild(el("div", "name", entry.name));
+    var pts = el("div", "pts");
+    var b = el("b", null, fmt(entry.points));
+    pts.appendChild(b);
+    pts.appendChild(document.createTextNode(" pts"));
+    who.appendChild(pts);
+    slot.appendChild(who);
+    slot.appendChild(el("div", "block", String(entry.rank)));
+    return slot;
+  }
+
+  function render(entries) {
+    boardEl.textContent = "";
+    if (!entries.length) {
+      var n = el("div", "notice");
+      n.appendChild(el("b", null, "No scores yet"));
+      n.appendChild(document.createTextNode("Member points will appear here once they are entered in the sheet."));
+      boardEl.appendChild(n);
+      return;
+    }
+
+    var top = entries.slice(0, 3);
+    var podium = el("section", "podium");
+    podium.setAttribute("aria-label", "Top three");
+    // Visual order: 2nd, 1st, 3rd
+    if (top[1]) podium.appendChild(podiumSlot(top[1], "second"));
+    else podium.appendChild(el("div"));
+    podium.appendChild(podiumSlot(top[0], "first"));
+    if (top[2]) podium.appendChild(podiumSlot(top[2], "third"));
+    else podium.appendChild(el("div"));
+    boardEl.appendChild(podium);
+    boardEl.appendChild(el("div", "podium-base"));
+
+    var rest = entries.slice(3);
+    if (rest.length) {
+      var head = el("div", "list-head");
+      head.appendChild(el("span", null, "Rank"));
+      head.appendChild(el("span", null, "Member"));
+      head.appendChild(el("span", null, "Points"));
+      boardEl.appendChild(head);
+
+      var ol = el("ol", "rank-list");
+      rest.forEach(function (e) {
+        var li = el("li");
+        li.value = e.rank;
+        li.appendChild(el("span", "pos", String(e.rank)));
+        li.appendChild(el("span", "nm", e.name));
+        li.appendChild(el("span", "sc", fmt(e.points)));
+        ol.appendChild(li);
+      });
+      boardEl.appendChild(ol);
+    }
+  }
+
+  function showLoading() {
+    boardEl.textContent = "";
+    statusEl.textContent = "";
+    var n = el("div", "notice");
+    n.appendChild(el("b", null, "Loading leaderboard…"));
+    n.appendChild(document.createTextNode("Getting the latest scores."));
+    statusEl.appendChild(n);
+    for (var i = 0; i < 5; i++) boardEl.appendChild(el("div", "loading-line"));
+  }
+
+  function showError(hasOldData) {
+    statusEl.textContent = "";
+    var n = el("div", "notice error");
+    n.appendChild(el("b", null, "Couldn't load the latest scores"));
+    n.appendChild(document.createTextNode(
+      hasOldData
+        ? "Showing the last scores we loaded. We'll try again in a minute, or tap Refresh now."
+        : "Check your internet connection, then tap Refresh now. If it keeps happening, let a BFT Gladesville coach know."
+    ));
+    statusEl.appendChild(n);
+    if (!hasOldData) boardEl.textContent = "";
+  }
+
+  function stamp() {
+    var d = new Date();
+    updatedEl.textContent = d.toLocaleString("en-AU", {
+      weekday: "short", day: "numeric", month: "short",
+      hour: "numeric", minute: "2-digit"
+    });
+  }
+
+  // ---------- Fetching ----------
+  function load(isFirst) {
+    if (inFlight) return;
+    inFlight = true;
+    refreshBtn.disabled = true;
+    if (isFirst && !lastGood) showLoading();
+
+    var url = CSV_URL + (CSV_URL.indexOf("?") > -1 ? "&" : "?") + "t=" + Date.now();
+    fetch(url, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        if (/^\s*<(!doctype|html)/i.test(text)) throw new Error("Not CSV");
+        var entries = toEntries(parseCSV(text));
+        lastGood = entries;
+        statusEl.textContent = "";
+        render(entries);
+        stamp();
+      })
+      .catch(function () {
+        if (lastGood) { showError(true); }
+        else { showError(false); }
+      })
+      .then(function () {
+        inFlight = false;
+        refreshBtn.disabled = false;
+      });
+  }
+
+  refreshBtn.addEventListener("click", function () { load(false); });
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) load(false);
+  });
+  setInterval(function () { if (!document.hidden) load(false); }, REFRESH_MS);
+  load(true);
+})();
+</script>
+</body>
+</html>
